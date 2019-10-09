@@ -5,11 +5,13 @@ const path = require('path');
 const session = require('express-session');
 const flash = require('connect-flash');
 const mysqlStore = require('express-mysql-session');
+const passport = require('passport');
 
 const {database} = require('./key');
 
 //Initializations
 const app = express();
+require('./lib/passport');
 
 //Configurations
 app.set('port', process.env.PORT || 4000);
@@ -33,12 +35,15 @@ app.use(session({
     saveUninitialized: false,
     store: new mysqlStore(database)
 }));
+//send messages through views
 app.use(flash());
 app.use(morgan('dev'));
 //Management of get data
 app.use(express.urlencoded({extended: false}));
 app.use(express.json());
-//send messages through views
+app.use(passport.initialize());
+app.use(passport.session());
+
 
 
 //Global variables
