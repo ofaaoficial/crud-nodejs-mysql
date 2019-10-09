@@ -19,6 +19,13 @@ router.post('/create', async (req, res) => {
     res.send('received');
 });
 
+router.get('/', async (req, res) => {
+    await pool.query("SELECT * FROM books", async (err, resQuery) => {
+        if(err) throw new Error(err);
+        let books = await resQuery;
+        res.render('books/index', {books});
+    } );
+});
 
 
 module.exports = router;
