@@ -35,13 +35,12 @@ app.use((req, res, next)=> {
 //Routes
 app.use(require('./routes'));
 app.use(require('./routes/authentication'));
-app.use('/links', require('./routes/links'));
+app.use('/books', require('./routes/books'));
 
 //Public files
 app.use(express.static(path.join(__dirname, 'public')));
 
 //Starting server
-
 app.listen(app.get('port'), ()=> {
     console.log(`Server on port : ${app.get('port')}`);
 });
