@@ -22,21 +22,30 @@ router.post('/create', async (req, res) => {
 router.get('/', async (req, res) => {
     await pool.query("SELECT * FROM books", async (err, resQuery) => {
         if(err) throw new Error(err);
-        let books = await resQuery;
+        const books = await resQuery;
         res.render('books/index', {books});
     } );
 });
 
 router.get('/edit/:id', async (req, res) => {
-    await pool.query("SELECT * FROM books WHERE id = ?", [req.params.id], async (err, resQuery) => {
+    const {id} = req.params;
+    await pool.query("SELECT * FROM books WHERE id = ?", [id], async (err, resQuery) => {
         if(err) throw new Error(err);
-        let book = await resQuery;
+        const book = await resQuery[0];
         res.render('books/edit', {book})
     });
 })
 
+router.post('/edit/:id', async (req, res) => {
+    const {id} = req.params;
+    const {title, description} = req.body;
+    await pool.query('UPDATE books SET ? WHERE id = ?', [{title,description}, id]);
+    res.redirect('/books');
+})
+
 router.get('/delete/:id', async (req, res) => {
-    await pool.query('DELETE FROM books WHERE id = ?', [req.params.id]);
+    let {id} = req.params;
+    await pool.query('DELETE FROM books WHERE id = ?', [id]);
     res.redirect('/books');
 })
 
