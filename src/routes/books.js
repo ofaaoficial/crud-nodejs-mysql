@@ -41,12 +41,14 @@ router.post('/edit/:id', async (req, res) => {
     const {id} = req.params;
     const {title, description} = req.body;
     await pool.query('UPDATE books SET ? WHERE id = ?', [{title,description}, id]);
+    req.flash('msg', 'Book updated successfully.');
     res.redirect('/books');
 })
 
 router.get('/delete/:id', async (req, res) => {
     let {id} = req.params;
     await pool.query('DELETE FROM books WHERE id = ?', [id]);
+    req.flash('msg', 'Book removed successfully.');
     res.redirect('/books');
 })
 
