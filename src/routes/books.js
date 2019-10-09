@@ -16,7 +16,7 @@ router.post('/create', async (req, res) => {
     }
 
     await pool.query('INSERT INTO books SET ?', [newBook]);
-    res.send('received');
+    res.redirect('/books');
 });
 
 router.get('/', async (req, res) => {
@@ -27,5 +27,17 @@ router.get('/', async (req, res) => {
     } );
 });
 
+router.get('/edit/:id', async (req, res) => {
+    await pool.query("SELECT * FROM books WHERE id = ?", [req.params.id], async (err, resQuery) => {
+        if(err) throw new Error(err);
+        let book = await resQuery;
+        res.render('books/edit', {book})
+    });
+})
+
+router.get('/delete/:id', async (req, res) => {
+    await pool.query('DELETE FROM books WHERE id = ?', [req.params.id]);
+    res.redirect('/books');
+})
 
 module.exports = router;
