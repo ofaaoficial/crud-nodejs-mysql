@@ -2,6 +2,11 @@ const express = require('express');
 const morgan = require('morgan');
 const exphbs = require('express-handlebars');
 const path = require('path');
+const session = require('express-session');
+const flash = require('connect-flash');
+const mysqlStore = require('express-mysql-session');
+
+const {database} = require('./key');
 
 //Initializations
 const app = express();
@@ -22,13 +27,23 @@ app.engine('.hbs', exphbs({
 app.set('view engine', '.hbs');
 
 //Middlewares - Security
+app.use(session({
+    secret: 'ofaaoficial',
+    resave: false,
+    saveUninitialized: false,
+    store: new mysqlStore(database)
+}));
+app.use(flash());
 app.use(morgan('dev'));
 //Management of get data
 app.use(express.urlencoded({extended: false}));
 app.use(express.json());
+//send messages through views
+
 
 //Global variables
 app.use((req, res, next)=> {
+    app.locals.msg = req.flash('msg');
     next();
 });
 

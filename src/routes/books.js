@@ -16,6 +16,7 @@ router.post('/create', async (req, res) => {
     }
 
     await pool.query('INSERT INTO books SET ?', [newBook]);
+    req.flash('msg', 'Book saved successfully.');
     res.redirect('/books');
 });
 
