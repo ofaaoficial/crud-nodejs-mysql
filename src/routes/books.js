@@ -2,12 +2,13 @@ const express = require('express');
 const router = express.Router();
 
 const pool = require('../database');
+const { isLoggedIn } = require('../lib/auth');
 
-router.get('/create', (req, res) => {
+router.get('/create', isLoggedIn, (req, res) => {
     res.render('books/create');
 });
 
-router.post('/create', async (req, res) => {
+router.post('/create', isLoggedIn, async (req, res) => {
     //Destructuring
     const {title, description} = req.body ;
     const newBook = {
@@ -20,7 +21,7 @@ router.post('/create', async (req, res) => {
     res.redirect('/books');
 });
 
-router.get('/', async (req, res) => {
+router.get('/', isLoggedIn, async (req, res) => {
     await pool.query("SELECT * FROM books", async (err, resQuery) => {
         if(err) throw new Error(err);
         const books = await resQuery;
@@ -28,7 +29,7 @@ router.get('/', async (req, res) => {
     } );
 });
 
-router.get('/edit/:id', async (req, res) => {
+router.get('/edit/:id', isLoggedIn, async (req, res) => {
     const {id} = req.params;
     await pool.query("SELECT * FROM books WHERE id = ?", [id], async (err, resQuery) => {
         if(err) throw new Error(err);
@@ -37,7 +38,7 @@ router.get('/edit/:id', async (req, res) => {
     });
 })
 
-router.post('/edit/:id', async (req, res) => {
+router.post('/edit/:id', isLoggedIn, async (req, res) => {
     const {id} = req.params;
     const {title, description} = req.body;
     await pool.query('UPDATE books SET ? WHERE id = ?', [{title,description}, id]);
@@ -45,7 +46,7 @@ router.post('/edit/:id', async (req, res) => {
     res.redirect('/books');
 })
 
-router.get('/delete/:id', async (req, res) => {
+router.get('/delete/:id', isLoggedIn, async (req, res) => {
     let {id} = req.params;
     await pool.query('DELETE FROM books WHERE id = ?', [id]);
     req.flash('msg', 'Book removed successfully.');

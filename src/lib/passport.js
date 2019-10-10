@@ -46,7 +46,7 @@ passport.use('local.signin', new localStrategy({
         if(!user) return done(null, false, req.flash('err', `The username does not exists.`));
 
         const validPassword = await matchPassword(password, user.password);
-        if(validPassword) return done(null, user, req.flash('err',`Welcome ${user.fullname}`));
+        if(validPassword) return done(null, user, req.flash('msg',`Welcome ${user.fullname}`));
 
         return done(null, null, req.flash('err',`Incorrect password`));
     });
