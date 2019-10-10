@@ -13,7 +13,8 @@ router.post('/create', isLoggedIn, async (req, res) => {
     const {title, description} = req.body ;
     const newBook = {
         title,
-        description
+        description,
+        user_id: req.user.id
     }
 
     await pool.query('INSERT INTO books SET ?', [newBook]);
@@ -22,7 +23,7 @@ router.post('/create', isLoggedIn, async (req, res) => {
 });
 
 router.get('/', isLoggedIn, async (req, res) => {
-    await pool.query("SELECT * FROM books", async (err, resQuery) => {
+    await pool.query("SELECT * FROM books WHERE user_id = ?", [req.user.id], async (err, resQuery) => {
         if(err) throw new Error(err);
         const books = await resQuery;
         res.render('books/index', {books});
