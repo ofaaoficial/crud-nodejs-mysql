@@ -1,8 +1,10 @@
 const passport = require('passport');
 const localStrategy = require('passport-local').Strategy;
 const pool = require('../database');
-const {encryptPassword} = require('../lib/helpers');
+const {encryptPassword, matchPassword} = require('../lib/helpers');
 
+
+//Sign up - Register
 passport.use('local.signup', new localStrategy({
     usernameField: 'username',
     passwordField: 'password',
@@ -27,7 +29,25 @@ passport.serializeUser((usr, done) => {
 });
 
 passport.deserializeUser(async (id, done)=> {
-    await pool.query('SELECT * FROM users WHERE id = ?', [id], async (err, resQuery)=>{
+    await pool.query('SELECT * FROM users WHERE id = ?', [id], async (err, resQuery) =>{
         done(null, resQuery[0]);
     });
 });
+
+
+//Sign in - Login
+passport.use('local.signin', new localStrategy({
+    usernameField: 'username',
+    passwordField: 'password',
+    passReqToCallback: true
+}, async (req, username, password, done)=> {
+    await pool.query('SELECT * FROM users WHERE username = ?', [username], async (err, resQuery) => {
+        let user = await resQuery[0];
+        if(!user) return done(null, false, req.flash('err', `The username does not exists.`));
+
+        const validPassword = await matchPassword(password, user.password);
+        if(validPassword) return done(null, user, req.flash('err',`Welcome ${user.fullname}`));
+
+        return done(null, null, req.flash('err',`Incorrect password`));
+    });
+}));
