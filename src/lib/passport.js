@@ -41,6 +41,7 @@ passport.use('local.signin', new localStrategy({
     passwordField: 'password',
     passReqToCallback: true
 }, async (req, username, password, done)=> {
+    console.log('hola');
     await pool.query('SELECT * FROM users WHERE username = ?', [username], async (err, resQuery) => {
         let user = await resQuery[0];
         if(!user) return done(null, false, req.flash('err', `The username does not exists.`));
